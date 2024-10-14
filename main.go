@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/pocketbase/pocketbase/apis"
 	"log"
 	"net/http"
 	"os"
@@ -54,17 +55,39 @@ func startPocketbase() {
 
 func addCustomRoutes(pb *pocketbase.PocketBase) {
 
-	pb.OnBeforeServe().Add(
-		func(e *core.ServeEvent) error {
-			e.Router.GET("/hello/:name", func(c echo.Context) error {
-				name := c.PathParam("name")
+	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		e.Router.GET("/hello/:name", func(c echo.Context) error {
+			name := c.PathParam("name")
 
-				//pb.Dao().
+			return c.JSON(http.StatusOK, map[string]string{"message": "Hello " + name})
+		}) /* optional middlewares */
 
-				return c.JSON(http.StatusOK, map[string]string{"message": "Hello " + name})
-			}) /* optional middlewares */
+		return nil
+	})
 
-			return nil
+	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		e.Router.GET("/snippy/appointments", func(c echo.Context) error {
+
+			appointments, err := pb.Dao().FindCollectionByNameOrId("appointments")
+			if err != nil {
+				return err
+			}
+
+			return c.JSON(http.StatusOK, appointments)
 		})
+		return nil
+	})
+
+	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		// attach a middleware globally to all routes
+		//e.Router.Use(someMiddlereFunc)
+
+		// attach multiple middlewares to a single route
+		// each route will execute their own middlewares + the global ones
+		e.Router.GET("/hello", func(c echo.Context) error {
+			return c.String(200, "Hello world!")
+		}, apis.ActivityLogger(pb), apis.RequireAdminAuth())
+		return nil
+	})
 
 }
