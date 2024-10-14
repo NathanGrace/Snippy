@@ -8,15 +8,17 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
-	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 )
 
-func main() {
-	//how to write good http services:
-	//https://grafana.com/blog/2024/02/09/how-i-write-http-services-in-go-after-13-years/
+type Appointments struct {
+	Id      string `db:"id" json:"id"`
+	StaffId string `db:"staff_id" json:"staff_id"`
+}
 
+func main() {
 	ctx := context.Background()
 	if err := run(ctx); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -29,7 +31,6 @@ func run(ctx context.Context) error {
 	defer cancel()
 
 	startPocketbase()
-	//startServer()
 
 	return nil
 }
@@ -37,24 +38,33 @@ func run(ctx context.Context) error {
 func startPocketbase() {
 	pb := pocketbase.New()
 
+	addCustomRoutes(pb)
+
 	//serves static files from the provided public dir (if exists)
-	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("./pb_public"), false))
-		return nil
-	})
+	//I think pb_public is where you could put your front end code
+	//pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+	//	e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("./pb_public"), false))
+	//	return nil
+	//})
 
 	if err := pb.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func startServer() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(w, "Hello from Go backend!")
-	})
+func addCustomRoutes(pb *pocketbase.PocketBase) {
 
-	fmt.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
+	pb.OnBeforeServe().Add(
+		func(e *core.ServeEvent) error {
+			e.Router.GET("/hello/:name", func(c echo.Context) error {
+				name := c.PathParam("name")
+
+				//pb.Dao().
+
+				return c.JSON(http.StatusOK, map[string]string{"message": "Hello " + name})
+			}) /* optional middlewares */
+
+			return nil
+		})
+
 }
