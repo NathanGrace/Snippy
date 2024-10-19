@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3abe3a25-a517-465e-9896-4099531623be" name="Changes" comment="init">
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pb_data/data.db" beforeDir="false" afterPath="$PROJECT_DIR$/pb_data/data.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pb_data/logs.db" beforeDir="false" afterPath="$PROJECT_DIR$/pb_data/logs.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +20,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Go File" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
@@ -76,7 +80,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
-    <option name="LAST_COMMIT_MESSAGE" value="init" />
+    <MESSAGE value="learning custom routes" />
+    <option name="LAST_COMMIT_MESSAGE" value="learning custom routes" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

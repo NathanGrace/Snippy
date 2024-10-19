@@ -3,20 +3,56 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/pocketbase/pocketbase/apis"
+	"github.com/labstack/echo/v5"
+	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/core"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-
-	"github.com/labstack/echo/v5"
-	"github.com/pocketbase/pocketbase"
-	"github.com/pocketbase/pocketbase/core"
 )
 
+type Users struct {
+	Id       string `db:"id" json:"id"`
+	Username string `db:"username" json:"username"`
+	Email    string `db:"email" json:"email"`
+	Name     string `db:"name" json:"name"`
+	Avatar   string `db:"avatar" json:"avatar"`
+	Created  string `db:"created" json:"created"`
+	Updated  string `db:"updated" json:"updated"`
+}
+
+type StaffMembers struct {
+	Id             string `db:"id" json:"id"`
+	Name           string `db:"name" json:"name"`
+	Phone          string `db:"phone" json:"phone"`
+	StaffId        string `db:"staff_id" json:"staff_id"`
+	AdditionalInfo string `db:"additional_info" json:"additional_info"`
+	Created        string `db:"created" json:"created"`
+	Updated        string `db:"updated" json:"updated"`
+}
+
 type Appointments struct {
-	Id      string `db:"id" json:"id"`
-	StaffId string `db:"staff_id" json:"staff_id"`
+	Id                  string `db:"id" json:"id"`
+	StaffId             string `db:"staff_id" json:"staff_id"`
+	ClientId            string `db:"client_id" json:"client_id"`
+	IsAvailable         bool   `db:"is_available" json:"is_available"`
+	AdditionalInfo      string `db:"additional_info" json:"additional_info"`
+	Service             string `db:"service" json:"service"`
+	AppointmentDateTime string `db:"appointment_date_time" json:"appointment_date_time"`
+	ClientName          string `db:"client_name" json:"client_name"`
+	Created             string `db:"created" json:"created"`
+	Updated             string `db:"updated" json:"updated"`
+}
+
+type Clients struct {
+	Id             string `db:"id" json:"id"`
+	Name           string `db:"name" json:"name"`
+	Phone          string `db:"phone" json:"phone"`
+	StaffId        string `db:"staff_id" json:"staff_id"`
+	AdditionalInfo string `db:"additional_info" json:"additional_info"`
+	Created        string `db:"created" json:"created"`
+	Updated        string `db:"updated" json:"updated"`
 }
 
 func main() {
@@ -41,52 +77,80 @@ func startPocketbase() {
 
 	addCustomRoutes(pb)
 
-	//serves static files from the provided public dir (if exists)
-	//I think pb_public is where you could put your front end code
-	//pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-	//	e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS("./pb_public"), false))
-	//	return nil
-	//})
-
 	if err := pb.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func addCustomRoutes(pb *pocketbase.PocketBase) {
-
 	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-		e.Router.GET("/hello/:name", func(c echo.Context) error {
-			name := c.PathParam("name")
+
+		//BASIC EXAMPLE GIVEN BY DOCS
+		e.Router.GET("/hello1/:name1", func(c echo.Context) error {
+			name := c.PathParam("name1")
 
 			return c.JSON(http.StatusOK, map[string]string{"message": "Hello " + name})
 		}) /* optional middlewares */
 
-		return nil
-	})
+		//same example with different syntax.
+		_, _ = e.Router.AddRoute(echo.Route{
+			Method: http.MethodGet,
+			Path:   "/hello2/:name2",
+			Handler: func(c echo.Context) error {
+				name := c.PathParam("name2")
+				return c.JSON(200, map[string]string{"message": "Hello " + name + "!"})
+			},
+			Middlewares: []echo.MiddlewareFunc{
+				/* optional middlewares */
+			},
+		})
 
-	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		//me testing actual stuff
 		e.Router.GET("/snippy/appointments", func(c echo.Context) error {
 
-			appointments, err := pb.Dao().FindCollectionByNameOrId("appointments")
+			appointments := []Appointments{}
+			err := pb.Dao().DB().
+				NewQuery("SELECT * FROM appointments").
+				All(&appointments)
 			if err != nil {
 				return err
 			}
 
-			return c.JSON(http.StatusOK, appointments)
+			return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
 		})
-		return nil
-	})
 
-	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-		// attach a middleware globally to all routes
-		//e.Router.Use(someMiddlereFunc)
+		e.Router.GET("/snippy/apts", func(c echo.Context) error {
 
-		// attach multiple middlewares to a single route
-		// each route will execute their own middlewares + the global ones
-		e.Router.GET("/hello", func(c echo.Context) error {
-			return c.String(200, "Hello world!")
-		}, apis.ActivityLogger(pb), apis.RequireAdminAuth())
+			appointments := []Appointments{}
+			err := pb.Dao().DB().
+				NewQuery("SELECT * FROM appointments").
+				All(&appointments)
+
+			//staff_id = user_id
+			//is_available = false
+			//appointment_date_time >= selected Day start
+			//appointment_date_time <= selected day end
+			if err != nil {
+				return err
+			}
+
+			return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
+		})
+
+		e.Router.GET("/snippy/auth", func(c echo.Context) error {
+
+			appointments := []Appointments{}
+			err := pb.Dao().DB().
+				NewQuery("SELECT * FROM appointments").
+				All(&appointments)
+
+			if err != nil {
+				return err
+			}
+
+			return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
+		})
+
 		return nil
 	})
 
