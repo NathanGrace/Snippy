@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3abe3a25-a517-465e-9896-4099531623be" name="Changes" comment="init">
+    <list default="true" id="3abe3a25-a517-465e-9896-4099531623be" name="Changes" comment="learning docker">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pb_data/logs.db" beforeDir="false" afterPath="$PROJECT_DIR$/pb_data/logs.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +79,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
     <MESSAGE value="learning custom routes" />
-    <option name="LAST_COMMIT_MESSAGE" value="learning custom routes" />
+    <MESSAGE value="learning docker" />
+    <option name="LAST_COMMIT_MESSAGE" value="learning docker" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
