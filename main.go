@@ -142,7 +142,7 @@ func addCustomRoutes(pb *pocketbase.PocketBase) {
 			appointments := []Appointments{}
 			err := pb.Dao().DB().
 				NewQuery("SELECT * FROM appointments").
-				All(&appointments)
+				All(&appointments) //returns this appointments slice
 
 			if err != nil {
 				return err
