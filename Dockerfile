@@ -14,6 +14,6 @@ COPY --from=builder /pocketbase /app/pocketbase
 #CMD ["/app/pocketbase", "serve", "--https=testing.snippy.info:8090"]
 
 EXPOSE 3000
-#CMD ["/app/pocketbase", "serve", "--http=testing.snippy.info:3000"]
+CMD ["/app/pocketbase", "serve", "--http=testing.snippy.info:3000"]
 
-CMD ["/app/pocketbase", "serve", "--http=0.0.0.0:8090"]
+#CMD ["/app/pocketbase", "serve", "--http=0.0.0.0:8090"]
