@@ -6,11 +6,11 @@
 
 <div class="navbar bg-base-100">
 	<div class="flex-1">
-		<a href="./" class="btn btn-ghost text-xl">daisyUI</a>
+		<a href="./" class="btn btn-ghost text-xl">Snippy</a>
 	</div>
 	<div class="flex-none">
 		<ul class="menu menu-horizontal px-1">
-			<li><a href="./">Link</a></li>
+			<li><a href="/calendar">Calendar</a></li>
 			<li>
 				<details>
 					<summary>Parent</summary>
