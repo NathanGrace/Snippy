@@ -4,7 +4,7 @@
 </script>
 
 
-<div class="navbar bg-base-100">
+<div class="navbar relative h-16">
 	<div class="flex-1">
 		<a href="./" class="btn btn-ghost text-xl">Snippy</a>
 	</div>
