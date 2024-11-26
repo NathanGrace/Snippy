@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/echo/v5"
 	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 )
@@ -83,75 +82,84 @@ func startPocketbase() {
 }
 
 func addCustomRoutes(pb *pocketbase.PocketBase) {
-	pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+	pb.OnServe().BindFunc(func(se *core.ServeEvent) error {
+		// serves static files from the provided public dir (if exists)
+		se.Router.GET("/{path...}", apis.Static(os.DirFS("./pb_public"), false))
 
-		//BASIC EXAMPLE GIVEN BY DOCS
-		e.Router.GET("/hello1/:name1", func(c echo.Context) error {
-			name := c.PathParam("name1")
-
-			return c.JSON(http.StatusOK, map[string]string{"message": "Hello " + name})
-		}) /* optional middlewares */
-
-		//same example with different syntax.
-		_, _ = e.Router.AddRoute(echo.Route{
-			Method: http.MethodGet,
-			Path:   "/hello2/:name2",
-			Handler: func(c echo.Context) error {
-				name := c.PathParam("name2")
-				return c.JSON(200, map[string]string{"message": "Hello " + name + "!"})
-			},
-			Middlewares: []echo.MiddlewareFunc{
-				/* optional middlewares */
-			},
-		})
-
-		//me testing actual stuff
-		e.Router.GET("/snippy/appointments", func(c echo.Context) error {
-
-			appointments := []Appointments{}
-			err := pb.Dao().DB().
-				NewQuery("SELECT * FROM appointments").
-				All(&appointments)
-			if err != nil {
-				return err
-			}
-
-			return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
-		})
-
-		e.Router.GET("/snippy/apts", func(c echo.Context) error {
-
-			appointments := []Appointments{}
-			err := pb.Dao().DB().
-				NewQuery("SELECT * FROM appointments").
-				All(&appointments)
-
-			//staff_id = user_id
-			//is_available = false
-			//appointment_date_time >= selected Day start
-			//appointment_date_time <= selected day end
-			if err != nil {
-				return err
-			}
-
-			return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
-		})
-
-		e.Router.GET("/snippy/auth", func(c echo.Context) error {
-
-			appointments := []Appointments{}
-			err := pb.Dao().DB().
-				NewQuery("SELECT * FROM appointments").
-				All(&appointments) //returns this appointments slice
-
-			if err != nil {
-				return err
-			}
-
-			return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
-		})
-
-		return nil
+		return se.Next()
 	})
+
+	//old way before v23
+
+	//pb.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+	//
+	//	//BASIC EXAMPLE GIVEN BY DOCS
+	//	e.Router.GET("/hello1/:name1", func(c echo.Context) error {
+	//		name := c.PathParam("name1")
+	//
+	//		return c.JSON(http.StatusOK, map[string]string{"message": "Hello " + name})
+	//	}) /* optional middlewares */
+	//
+	//	//same example with different syntax.
+	//	_, _ = e.Router.AddRoute(echo.Route{
+	//		Method: http.MethodGet,
+	//		Path:   "/hello2/:name2",
+	//		Handler: func(c echo.Context) error {
+	//			name := c.PathParam("name2")
+	//			return c.JSON(200, map[string]string{"message": "Hello " + name + "!"})
+	//		},
+	//		Middlewares: []echo.MiddlewareFunc{
+	//			/* optional middlewares */
+	//		},
+	//	})
+	//
+	//	//me testing actual stuff
+	//	e.Router.GET("/snippy/appointments", func(c echo.Context) error {
+	//
+	//		appointments := []Appointments{}
+	//		err := pb.Dao().DB().
+	//			NewQuery("SELECT * FROM appointments").
+	//			All(&appointments)
+	//		if err != nil {
+	//			return err
+	//		}
+	//
+	//		return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
+	//	})
+	//
+	//	e.Router.GET("/snippy/apts", func(c echo.Context) error {
+	//
+	//		appointments := []Appointments{}
+	//		err := pb.Dao().DB().
+	//			NewQuery("SELECT * FROM appointments").
+	//			All(&appointments)
+	//
+	//		//staff_id = user_id
+	//		//is_available = false
+	//		//appointment_date_time >= selected Day start
+	//		//appointment_date_time <= selected day end
+	//		if err != nil {
+	//			return err
+	//		}
+	//
+	//		return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
+	//	})
+	//
+	//	e.Router.GET("/snippy/auth", func(c echo.Context) error {
+	//
+	//		appointments := []Appointments{}
+	//		err := pb.Dao().DB().
+	//			NewQuery("SELECT * FROM appointments").
+	//			All(&appointments) //returns this appointments slice
+	//
+	//		if err != nil {
+	//			return err
+	//		}
+	//
+	//		return c.JSON(http.StatusOK, map[string][]Appointments{"appointments": appointments})
+	//	})
+	//
+	//	return nil
+	//})
 
 }
